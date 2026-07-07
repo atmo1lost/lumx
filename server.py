@@ -1,14 +1,18 @@
 import asyncio
+import base64
+import json
 import shutil
 import os
 import subprocess
 import re
 import sys
+import secrets
 import websockets
 
 print("server starting")
 
-clients = set()
+# aigh aigh aighhhhhhh
+rooms = {}
 PORT = 8765
 
 
@@ -62,25 +66,63 @@ async def start_cloudflared(port):
     process.terminate()
     raise RuntimeError("cloudflared started, but no public tunnel URL was found")
 
+def get_room(room_name):
+    room = rooms.get(room_name)
+    if room is None:
+        room = {
+            # crate the salt
+            "salt": secrets.token_bytes(16),
+            "clients": set(),
+        }
+        rooms[room_name] = room
+    return room
+
+
 async def echo(websocket):
     print("client connected")
-    clients.add(websocket)
+    room = None
     try:
+        raw_join = await websocket.recv()
+        join = json.loads(raw_join)
+        if join.get("type") != "join":
+            await websocket.send(json.dumps({"type": "error", "message": "first message must be join"}))
+            return
+
+        room_name = str(join.get("room", "")).strip()
+        username = str(join.get("username", "")).strip()
+        if not room_name or not username:
+            await websocket.send(json.dumps({"type": "error", "message": "missing room or username"}))
+            return
+
+        room = get_room(room_name)
+        room["clients"].add(websocket)
+        await websocket.send(
+            json.dumps(
+                {
+                    "type": "joined",
+                    "room": room_name,
+                    "salt": base64.b64encode(room["salt"]).decode("ascii"),
+                }
+            )
+        )
+        print(f"client joined room: {room_name}")
+
         async for message in websocket:
             if not message.strip():
                 continue
             print(f"received: {message}")
             dead_clients = set()
-            for client in clients.copy():
+            for client in room["clients"].copy():
                 if client is websocket:
                     continue
                 try:
                     await client.send(message)
                 except websockets.ConnectionClosed:
                     dead_clients.add(client)
-            clients.difference_update(dead_clients)
+            room["clients"].difference_update(dead_clients)
     finally:
-        clients.discard(websocket)
+        if room is not None:
+            room["clients"].discard(websocket)
 
 async def main():
     tunnel_process = None

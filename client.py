@@ -5,16 +5,14 @@ import json
 import websockets
 from nacl import pwhash, secret, exceptions
 
-ROOM_SALT = b"lumx-chat-key!!1"  # exactly 16 bytes
-
-def make_box(room_key: str | None):
-    if not room_key:
+def make_box(room_key: str | None, room_salt: bytes | None):
+    if not room_key or room_salt is None:
         return None
 
     key = pwhash.argon2id.kdf(
         secret.SecretBox.KEY_SIZE,
         room_key.encode("utf-8"),
-        ROOM_SALT,
+        room_salt,
         opslimit=pwhash.argon2id.OPSLIMIT_MODERATE,
         memlimit=pwhash.argon2id.MEMLIMIT_MODERATE,
     )
@@ -26,6 +24,7 @@ async def client():
     if username == "":
         print("invalid username, try again.")
         username = input("username: ").strip()
+    room_name = input("room name: ").strip()
     room_key = input("room key (leave blank for plaintext): ").strip()
 
     print("(leave none for localhost)")
@@ -33,9 +32,30 @@ async def client():
     if server == "":
         server = "ws://localhost:8765"
 
-    box = make_box(room_key)
-
     async with websockets.connect(server) as websocket:
+        await websocket.send(
+            json.dumps(
+                {
+                    "type": "join",
+                    "username": username,
+                    "room": room_name,
+                }
+            )
+        )
+
+        try:
+            join_response = json.loads(await websocket.recv())
+        except json.JSONDecodeError:
+            print("failed to join room: invalid server response")
+            return
+        if join_response.get("type") != "joined":
+            print(join_response.get("message", "failed to join room"))
+            return
+
+        room_salt_b64 = join_response.get("salt")
+        room_salt = base64.b64decode(room_salt_b64) if room_salt_b64 else None
+        box = make_box(room_key, room_salt)
+
         print(f"connected as {username}")
 
         async def receiver():

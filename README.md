@@ -5,10 +5,8 @@
 
 - [x] encryption
 - [x] reverse proxy [cloudflared]
-- [ ] per-room salt - (I) 
-- [ ] server finder - (III)
-- [ ] better ui - (II)
-- [ ] lumx webui - (IIII) 
+- [x] per-room salt 
+- [ ] lumx webui - (I) 
 
 
 <h2>what is our vision</h2>
