@@ -21,5 +21,6 @@ please check the wiki (https://github.com/atmo1lost/lumx/wiki)
 
 ## credits
 **founder**: atmo1lost (me) <br>
-**logo designer**: [luvpeng](https://guns.lol/penguin)
+**logo designer**: [luvpeng](https://pengis.online/home)
 > no one else...
+#
