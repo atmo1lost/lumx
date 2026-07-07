@@ -23,8 +23,8 @@ def ensure_cloudflared():
 
     if sys.platform.startswith("linux"):
         install_cmds = [
-            ["sudo", "apt-get", "update"],
-            ["sudo", "apt-get", "install", "-y", "cloudflared"],
+            ["sudo", "apt", "update"],
+            ["sudo", "apt", "install", "-y", "cloudflared"],
         ]
     elif sys.platform == "darwin":
         install_cmds = [
