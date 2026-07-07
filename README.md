@@ -20,5 +20,6 @@ please check the wiki (https://github.com/atmo1lost/lumx/wiki)
 <h4>at the bottom of the forked repo, please include a list of the edits you have made, <br>dont just change the name and give yourself the credit. once youve done that, do whatever you like!</h4>
 
 ## credits
-**founder**: atmo1lost (me)
+**founder**: atmo1lost (me) <br>
+**logo designer**: [luvpeng](https://guns.lol/penguin)
 > no one else...
