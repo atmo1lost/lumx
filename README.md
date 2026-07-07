@@ -4,6 +4,7 @@
 <h2>checklist</h2>
 
 - [x] encryption
+- [x] reverse proxy [cloudflared]
 - [ ] per-room salt - (I) 
 - [ ] server finder - (III)
 - [ ] better ui - (II)
