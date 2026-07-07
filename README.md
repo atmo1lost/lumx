@@ -11,7 +11,7 @@
 
 <h2>features</h2>
 1. c2c encryption<br>
-2. per-room salt<br>
+2. per-server salt<br>
 3. reverse proxy [cloudflared]<br>
 4. servers w/ channels
 5. and more!
