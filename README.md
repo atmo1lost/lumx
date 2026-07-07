@@ -1,12 +1,14 @@
 # lumx
 > **lumx** is in HEAVY HEAVY alpha, expect bugs and not everything will work.
+> all issues and prs welcome!!!
 
 <h2>checklist</h2>
 
 - [x] encryption
 - [x] reverse proxy [cloudflared]
-- [x] per-room salt 
-- [ ] lumx webui - (I) 
+- [x] per-room salt
+- [ ] speed optimisation (I)
+- [ ] lumx webui - (II) 
 
 
 <h2>what is our vision</h2>
