@@ -3,7 +3,8 @@
 
 <h2>checklist</h2>
 
-- [ ] encryption - (I) 
+- [x] encryption
+- [ ] per-room salt - (I) 
 - [ ] server finder - (III)
 - [ ] better ui - (II)
 - [ ] lumx webui - (IIII) 
