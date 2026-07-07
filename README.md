@@ -6,11 +6,15 @@
 
 <h1>checklist</h1>
 
-- [x] encryption
-- [x] reverse proxy [cloudflared]
-- [x] per-room salt
 - [ ] speed optimisation (I)
-- [ ] lumx webui - (II) 
+- [ ] lumx webui - (II)
+
+<h2>features</h2>
+1. c2c encryption<br>
+2. per-room salt<br>
+3. reverse proxy [cloudflared]<br>
+4. servers w/ channels
+5. and more!
 
 <h3>setup</h3>
 please check the wiki (https://github.com/atmo1lost/lumx/wiki)
