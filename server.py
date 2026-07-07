@@ -35,7 +35,10 @@ def ensure_cloudflared():
 
     for cmd in install_cmds:
         print(f"running: {' '.join(cmd)}")
-        subprocess.run(cmd, check=True)
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as exc:
+            raise FileNotFoundError(f"cloudflared install command failed: {' '.join(cmd)}") from exc
 
     if shutil.which(cloudflared_path):
         return cloudflared_path
@@ -137,6 +140,8 @@ async def main():
             print("cloudflared was not found on PATH, running locally only")
         except RuntimeError as exc:
             print(str(exc))
+        except subprocess.CalledProcessError:
+            print("cloudflared install failed, running locally only")
 
     async with websockets.serve(echo, "localhost", PORT):
         # if public_url:
