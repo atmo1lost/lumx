@@ -1,8 +1,10 @@
-# lumx
-> **lumx** is in HEAVY HEAVY alpha, expect bugs and not everything will work.
+# lumx -- open-source encrypted chatrooms
+<img src="logo/image1alt.jpg">
+
+> **lumx** is in HEAVY HEAVY alpha, expect bugs and not everything will work.<br>
 > all issues and prs welcome!!!
 
-<h2>checklist</h2>
+<h1>checklist</h1>
 
 - [x] encryption
 - [x] reverse proxy [cloudflared]
@@ -22,5 +24,4 @@ please check the wiki (https://github.com/atmo1lost/lumx/wiki)
 ## credits
 **founder**: atmo1lost (me) <br>
 **logo designer**: [luvpeng](https://pengis.online/home)
-> no one else...
 #
