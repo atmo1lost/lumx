@@ -24,7 +24,7 @@ async def client():
     if username == "":
         print("invalid username, try again.")
         username = input("username: ").strip()
-    room_name = input("room name: ").strip()
+    room_name = input("channel name: ").strip()
     room_key = input("room key (leave blank for plaintext): ").strip()
 
     print("(leave none for localhost)")
@@ -38,7 +38,7 @@ async def client():
                 {
                     "type": "join",
                     "username": username,
-                    "room": room_name,
+                    "channel": room_name,
                 }
             )
         )
@@ -46,10 +46,10 @@ async def client():
         try:
             join_response = json.loads(await websocket.recv())
         except json.JSONDecodeError:
-            print("failed to join room: invalid server response")
+            print("failed to join channel: invalid server response")
             return
         if join_response.get("type") != "joined":
-            print(join_response.get("message", "failed to join room"))
+            print(join_response.get("message", "failed to join channel"))
             return
 
         room_salt_b64 = join_response.get("salt")
