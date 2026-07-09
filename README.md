@@ -4,17 +4,18 @@
 > **lumx** is in HEAVY HEAVY alpha, expect bugs and not everything will work.<br>
 > all issues and prs welcome!!!
 
-<h1>checklist</h1>
-
-- [ ] speed optimisation (II)
-- [ ] website (I)
-
 <h2>features</h2>
 1. c2c encryption<br>
 2. per-server salt<br>
 3. reverse proxy [cloudflared]<br>
 4. servers<br>
  and more!
+
+<h1>checklist</h1>
+
+- [ ] speed optimisation (II)
+- [ ] website (I)
+
 
 <h3>setup</h3>
 please check the wiki (https://github.com/atmo1lost/lumx/wiki)
