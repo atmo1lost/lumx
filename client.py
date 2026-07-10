@@ -4,6 +4,14 @@ import contextlib
 import json
 import websockets
 from nacl import pwhash, secret, exceptions
+import yaml
+
+with open("config.yml", "r") as f:
+    config = yaml.safe_load(f)
+
+host = config["server"]["host"]
+port = config["server"]["port"]
+open_browser = config["ui"]["open_browser"]
 
 def make_box(room_key: str | None, room_salt: bytes | None):
     if not room_key or room_salt is None:
@@ -20,18 +28,30 @@ def make_box(room_key: str | None, room_salt: bytes | None):
 
 
 async def client():
-    username = input("username: ").strip()
-    if username == "":
-        print("invalid username, try again.")
+    # ask for username obv
+    if config["client"]["username"] == "":
         username = input("username: ").strip()
-    room_name = input("channel name: ").strip()
-    room_key = input("room key (leave blank for plaintext): ").strip()
+    else:
+        username = config["client"]["username"]
+    # ask for encryption eky
+    if config["client"]["key"] == "":
+        room_key = input("room key (leave blank for plaintext): ").strip()
+    else:
+        room_key = config["client"]["room_key"]
 
-    print("(leave none for localhost)")
-    server = input("websocket: ").strip()
-    if server == "":
-        server = "ws://localhost:8765"
+    # ask for server websocket
+    if config["client"]["server"] == "":
+        server = input("server: ").strip()
+    else:
+        server = config["client"]["server"]
 
+    # ask for channel name
+    if config["client"]["channel"] == "":
+        room_name = input("channel: ").strip()
+    else:
+        room_name = config["client"]["channel"]
+
+    # sends {server} the needed data to join
     async with websockets.connect(server) as websocket:
         await websocket.send(
             json.dumps(
@@ -43,15 +63,19 @@ async def client():
             )
         )
 
+        # if server doesnt respond (most likely a typo)
         try:
             join_response = json.loads(await websocket.recv())
         except json.JSONDecodeError:
             print("failed to join channel: invalid server response")
             return
+        
+        # if join type isnt "joined" then send error
         if join_response.get("type") != "joined":
             print(join_response.get("message", "failed to join channel"))
             return
 
+        # gets serverside salt
         room_salt_b64 = join_response.get("salt")
         room_salt = base64.b64decode(room_salt_b64) if room_salt_b64 else None
         box = make_box(room_key, room_salt)
@@ -68,6 +92,7 @@ async def client():
                     print(f"\r{message}\n>: ", end="", flush=True)
                     continue
 
+                    # if message returns but you cant decrypt it (due to a diffrent room key)
                 if payload.get("type") == "encrypted":
                     if box is None:
                         print("\r[encrypted message received, but no room key is set]\n>: ", end="", flush=True)
