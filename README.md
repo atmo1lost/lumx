@@ -6,10 +6,9 @@
 
 <h2>features</h2>
 1. c2c encryption<br>
-2. per-server salt<br>
-3. reverse proxy [cloudflared]<br>
-4. servers<br>
- and more!
+2. reverse proxy [cloudflared]<br>
+3. servers<br>
+ and more coming very soon!
 
 <h1>checklist</h1>
 
