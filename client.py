@@ -9,6 +9,8 @@ import yaml
 with open("config.yml", "r") as f:
     config = yaml.safe_load(f)
 
+# REMEMBER TO EDIT CONFIGS IN config.yml!!!
+
 host = config["server"]["host"]
 port = config["server"]["port"]
 open_browser = config["ui"]["open_browser"]
