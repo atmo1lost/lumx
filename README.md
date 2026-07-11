@@ -12,8 +12,7 @@
 
 <h1>checklist</h1>
 
-- [ ] speed optimisation (II)
-- [ ] website (I)
+- [ ] webui (I)
 
 
 <h3>setup</h3>
