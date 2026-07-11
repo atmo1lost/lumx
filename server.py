@@ -30,8 +30,12 @@ def ensure_cloudflared():
         install_cmds = [
             ["brew", "install", "cloudflared"],
         ]
+    elif sys.platform.startswith == "win32" or "win" or "windows":
+        install_cmds = [
+            ["cloudflared.exe", "service", "install"],
+        ]
     else:
-        raise FileNotFoundError("cloudflared is not installed and no autoinstall path is known for this platform")
+        raise FileNotFoundError("cloudflared is not installed and no autoinstall path is known for this platform\nremember to check docs at https://github.com/atmo1lost/lumx/wiki")
 
     for cmd in install_cmds:
         print(f"running: {' '.join(cmd)}")
