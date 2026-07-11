@@ -1,12 +1,8 @@
-server:
-  host: "127.0.0.1"
-  port: 8080
-
 client:
   username: ""
   server: ""
   channel: ""
   room_key: "" # if you are going to use this, make sure to tell the people your going to text the KEY
 # 
-ui:
-  open_browser: true
+# ui:
+#   open_browser: false

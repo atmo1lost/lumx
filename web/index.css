@@ -1,0 +1,17 @@
+.img-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.img-header img {
+    width: 10rem;
+    height: auto;
+}
+
+.message-other {
+  align-self: flex-start;   
+  border-radius: 0;         
+  padding: 8px 12px;
+  max-width: 70%;
+}

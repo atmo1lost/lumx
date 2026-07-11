@@ -5,15 +5,21 @@ import json
 import websockets
 from nacl import pwhash, secret, exceptions
 import yaml
+# import threading
+# import webbrowser
+# import webui
+# import logging
 
 with open("config.yml", "r") as f:
     config = yaml.safe_load(f)
 
 # REMEMBER TO EDIT CONFIGS IN config.yml!!!
-
-host = config["server"]["host"]
-port = config["server"]["port"]
 open_browser = config["ui"]["open_browser"]
+
+# threading.Thread(
+#     target=webui.start,
+#     daemon=True
+# ).start()
 
 def make_box(room_key: str | None, room_salt: bytes | None):
     if not room_key or room_salt is None:
@@ -36,7 +42,7 @@ async def client():
     else:
         username = config["client"]["username"]
     # ask for encryption eky
-    if config["client"]["key"] == "":
+    if config["client"]["room_key"] == "":
         room_key = input("room key (leave blank for plaintext): ").strip()
     else:
         room_key = config["client"]["room_key"]
@@ -60,10 +66,14 @@ async def client():
                 {
                     "type": "join",
                     "username": username,
-                    "channel": room_name,
+                    "room": room_name,
                 }
             )
         )
+        # if config["ui"]["open_browser"]:
+        #     webbrowser.open("http://127.0.0.1:3000")
+        # else:
+        #     print("webui is running at http://127.0.0.1:3000")
 
         # if server doesnt respond (most likely a typo)
         try:
