@@ -9,6 +9,7 @@ import sys
 import secrets
 import websockets
 import yaml
+import pyperclip
 
 with open("config.yml", "r") as f:
     config = yaml.safe_load(f)
@@ -165,6 +166,8 @@ async def main():
             else:
                 serve_text = "lumx-server running on: ws://localhost:8765"
             print(serve_text)
+            pyperclip.copy(public_url)
+            print("url copied.")
         except FileNotFoundError:
             print("cloudflared was not found on PATH, running locally only")
         except RuntimeError as exc:
