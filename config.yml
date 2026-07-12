@@ -5,4 +5,4 @@ client:
   room_key: "" # if you are going to use this, make sure to tell the people your going to text the KEY
 
 dev:
-  verbose: True
+  verbose: false
