@@ -8,6 +8,10 @@ import re
 import sys
 import secrets
 import websockets
+import yaml
+
+with open("config.yml", "r") as f:
+    config = yaml.safe_load(f)
 
 print("server starting")
 
@@ -15,8 +19,11 @@ print("server starting")
 rooms = {}
 PORT = 8765
 
-
+if config["dev"]["verbose"] == True:
+    print("ensuring cloudflared is installed")
 def ensure_cloudflared():
+    if config["dev"]["verbose"] == True:
+        print("checking paths")
     cloudflared_path = os.environ.get("CLOUDFLARED_PATH", "cloudflared")
     if shutil.which(cloudflared_path):
         return cloudflared_path
@@ -26,20 +33,26 @@ def ensure_cloudflared():
             ["sudo", "apt", "update"],
             ["sudo", "apt", "install", "-y", "cloudflared"],
         ]
+
     elif sys.platform == "darwin":
         install_cmds = [
             ["brew", "install", "cloudflared"],
         ]
+
     elif sys.platform.startswith == "win32" or "win" or "windows":
         install_cmds = [
             ["cloudflared.exe", "service", "install"],
         ]
     else:
+        if config["dev"]["verbose"] == True:
+            print("issue!! look below.")
         raise FileNotFoundError("cloudflared is not installed and no autoinstall path is known for this platform\nremember to check docs at https://github.com/atmo1lost/lumx/wiki")
 
     for cmd in install_cmds:
         print(f"running: {' '.join(cmd)}")
         try:
+            if config["dev"]["verbose"] == True:
+                print("running subprocess to install")
             subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as exc:
             raise FileNotFoundError(f"cloudflared install command failed: {' '.join(cmd)}") from exc
@@ -51,6 +64,7 @@ def ensure_cloudflared():
 
 
 async def start_cloudflared(port):
+    print("starting cloudflared")
     cloudflared_path = ensure_cloudflared()
     cmd = [cloudflared_path, "tunnel", "--url", f"http://localhost:{port}"]
     process = subprocess.Popen(
@@ -59,7 +73,8 @@ async def start_cloudflared(port):
         stderr=subprocess.STDOUT,
         text=True,
     )
-
+    if config["dev"]["verbose"] == True:
+        print("recompiling cloudflared url")
     pattern = re.compile(r"https://[^\s]+\.trycloudflare\.com")
     for _ in range(60):
         line = process.stdout.readline() if process.stdout else ""
@@ -74,13 +89,19 @@ async def start_cloudflared(port):
     raise RuntimeError("cloudflared started, but no public tunnel URL was found")
 
 def get_room(room_name):
+    if config["dev"]["verbose"] == True:
+        print("getting rooms")
     room = rooms.get(room_name)
     if room is None:
+        if config["dev"]["verbose"] == True:
+            print("creating salt.")
         room = {
             # crate the salt
             "salt": secrets.token_bytes(16),
             "clients": set(),
         }
+        if config["dev"]["verbose"] == True:
+            print("finished creating room salt.")
         rooms[room_name] = room
     return room
 
@@ -139,7 +160,11 @@ async def main():
     if use_cloudflared:
         try:
             tunnel_process, public_url = await start_cloudflared(PORT)
-            print(f"lumx-server link: {public_url}")
+            if public_url:
+                serve_text = f"lumx-server running on: {public_url}"
+            else:
+                serve_text = "lumx-server running on: ws://localhost:8765"
+            print(serve_text)
         except FileNotFoundError:
             print("cloudflared was not found on PATH, running locally only")
         except RuntimeError as exc:
@@ -148,10 +173,7 @@ async def main():
             print("cloudflared install failed, running locally only")
 
     async with websockets.serve(echo, "localhost", PORT):
-        # if public_url:
-        #     print(f"lumx-server running on {public_url}")
-        # else:
-        #     print(f"lumx-server running on ws://localhost:{PORT}")
+        
         await asyncio.Future()
 
     if tunnel_process is not None:

@@ -18,6 +18,9 @@
 <h3>setup</h3>
 please check the wiki (https://github.com/atmo1lost/lumx/wiki)
 
+<h3>legal</h3>
+please check the legal notice @ https://github.com/atmo1lost/lumx/legal.md
+
 <h2>what is our vision</h2>
 <h4>our main goal with **lumx** is to get past all these survailence laws <br>ruining our privacy and making our chats less and less private.</h4>
 

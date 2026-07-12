@@ -14,7 +14,6 @@ with open("config.yml", "r") as f:
     config = yaml.safe_load(f)
 
 # REMEMBER TO EDIT CONFIGS IN config.yml!!!
-open_browser = config["ui"]["open_browser"]
 
 # threading.Thread(
 #     target=webui.start,
@@ -128,7 +127,6 @@ async def client():
         try:
             while True:
                 message = await asyncio.to_thread(input, ">: ")
-
                 if box is None:
                     await websocket.send(f"{username}: {message}")
                     continue

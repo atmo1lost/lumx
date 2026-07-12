@@ -3,6 +3,6 @@ client:
   server: ""
   channel: ""
   room_key: "" # if you are going to use this, make sure to tell the people your going to text the KEY
-# 
-# ui:
-#   open_browser: false
+
+dev:
+  verbose: True
