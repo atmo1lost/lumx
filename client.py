@@ -5,6 +5,7 @@ import json
 import websockets
 from nacl import pwhash, secret, exceptions
 import yaml
+
 # import threading
 # import webbrowser
 # import webui
@@ -19,6 +20,7 @@ with open("config.yml", "r") as f:
 #     target=webui.start,
 #     daemon=True
 # ).start()
+
 
 def make_box(room_key: str | None, room_salt: bytes | None):
     if not room_key or room_salt is None:
@@ -36,24 +38,24 @@ def make_box(room_key: str | None, room_salt: bytes | None):
 
 async def client():
     # ask for username obv
-    if config["client"]["username"] == "":
+    if not config["client"]["username"]:
         username = input("username: ").strip()
     else:
         username = config["client"]["username"]
     # ask for encryption eky
-    if config["client"]["room_key"] == "":
+    if not config["client"]["room_key"]:
         room_key = input("room key (leave blank for plaintext): ").strip()
     else:
         room_key = config["client"]["room_key"]
 
     # ask for server websocket
-    if config["client"]["server"] == "":
+    if not config["client"]["server"]:
         server = input("server: ").strip()
     else:
         server = config["client"]["server"]
 
     # ask for channel name
-    if config["client"]["channel"] == "":
+    if not config["client"]["channel"]:
         room_name = input("channel: ").strip()
     else:
         room_name = config["client"]["channel"]
@@ -80,7 +82,7 @@ async def client():
         except json.JSONDecodeError:
             print("failed to join channel: invalid server response")
             return
-        
+
         # if join type isnt "joined" then send error
         if join_response.get("type") != "joined":
             print(join_response.get("message", "failed to join channel"))
@@ -106,7 +108,11 @@ async def client():
                     # if message returns but you cant decrypt it (due to a diffrent room key)
                 if payload.get("type") == "encrypted":
                     if box is None:
-                        print("\r[encrypted message received, but no room key is set]\n>: ", end="", flush=True)
+                        print(
+                            "\r[encrypted message received, but no room key is set]\n>: ",
+                            end="",
+                            flush=True,
+                        )
                         continue
 
                     try:
@@ -114,7 +120,12 @@ async def client():
                         plaintext = box.decrypt(ciphertext).decode("utf-8")
                         sender = payload.get("username", "unknown")
                         print(f"\r{sender}: {plaintext}\n>: ", end="", flush=True)
-                    except (KeyError, ValueError, exceptions.CryptoError, UnicodeDecodeError):
+                    except (
+                        KeyError,
+                        ValueError,
+                        exceptions.CryptoError,
+                        UnicodeDecodeError,
+                    ):
                         print("\r[unable to decrypt message]\n>: ", end="", flush=True)
                     continue
 
