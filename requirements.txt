@@ -1,3 +1,4 @@
 websockets
 PyNaCl
 pyperclip
+PyYAML
