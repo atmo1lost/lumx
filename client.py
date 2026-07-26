@@ -2,24 +2,15 @@ import asyncio
 import base64
 import contextlib
 import json
-import websockets
-from nacl import pwhash, secret, exceptions
-import yaml
+import random
+import string
 
-# import threading
-# import webbrowser
-# import webui
-# import logging
+import websockets
+import yaml
+from nacl import exceptions, pwhash, secret
 
 with open("config.yml", "r") as f:
     config = yaml.safe_load(f)
-
-# REMEMBER TO EDIT CONFIGS IN config.yml!!!
-
-# threading.Thread(
-#     target=webui.start,
-#     daemon=True
-# ).start()
 
 
 def make_box(room_key: str | None, room_salt: bytes | None):
@@ -37,28 +28,17 @@ def make_box(room_key: str | None, room_salt: bytes | None):
 
 
 async def client():
-    # ask for username obv
-    if not config["client"]["username"]:
-        username = input("username: ").strip()
-    else:
-        username = config["client"]["username"]
-    # ask for encryption eky
-    if not config["client"]["room_key"]:
-        room_key = input("room key (leave blank for plaintext): ").strip()
-    else:
-        room_key = config["client"]["room_key"]
+    # get username from config, if it returns false get username from input, if blank generate a random 4c
+    username = config["client"].get("username") or input("username: ").strip()  or ''.join(random.choices(string.ascii_letters + string.digits, k=4))
 
-    # ask for server websocket
-    if not config["client"]["server"]:
-        server = input("server: ").strip()
-    else:
-        server = config["client"]["server"]
+    # get room key
+    room_key = config["client"].get("room_key") or input("room key (leave blank for plaintext): ").strip()
 
-    # ask for channel name
-    if not config["client"]["channel"]:
-        room_name = input("channel: ").strip()
-    else:
-        room_name = config["client"]["channel"]
+    # get server from config, if it returns false get server from input, if blank use localhost
+    server = config["client"].get("server") or input("server: ").strip() or "wss://127.0.0.1:8765"
+
+    # get room name from config, if it returns false get it from input, if blank it is "general"
+    room_name = config["client"].get("channel") or input("room: ").strip() or "general"
 
     # sends {server} the needed data to join
     async with websockets.connect(server) as websocket:
@@ -71,10 +51,6 @@ async def client():
                 }
             )
         )
-        # if config["ui"]["open_browser"]:
-        #     webbrowser.open("http://127.0.0.1:3000")
-        # else:
-        #     print("webui is running at http://127.0.0.1:3000")
 
         # if server doesnt respond (most likely a typo)
         try:

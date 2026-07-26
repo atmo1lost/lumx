@@ -38,12 +38,12 @@ def ensure_cloudflared():
             ["sudo", "apt", "install", "-y", "cloudflared"],
         ]
 
-    elif sys.platform == "darwin":
+    elif sys.platform("darwin"):
         install_cmds = [
             ["brew", "install", "cloudflared"],
         ]
 
-    elif sys.platform.startswith == "win32" or "win" or "windows":
+    elif sys.platform.startswith("win"):
         install_cmds = [
             ["cloudflared.exe", "service", "install"],
         ]
@@ -78,26 +78,35 @@ async def start_cloudflared(port):
         print("starting cloudflared")
     cloudflared_path = ensure_cloudflared()
     cmd = [cloudflared_path, "tunnel", "--url", f"http://localhost:{port}"]
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
+    process = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
     )
     if config["dev"]["verbose"]:
         print("recompiling cloudflared url")
     pattern = re.compile(r"https://[^\s]+\.trycloudflare\.com")
-    for _ in range(60):
-        line = process.stdout.readline() if process.stdout else ""
-        if line:
-            match = pattern.search(line)
-            if match:
-                public_url = match.group(0).replace("https://", "wss://")
-                return process, public_url
-        await asyncio.sleep(0.25)
 
-    process.terminate()
-    raise RuntimeError("cloudflared started, but no public tunnel URL was found")
+    async def read_lines():
+        while True:
+            line = await process.stdout.readline()
+            if not line:
+                return None
+            match = pattern.search(line.decode())
+            if match:
+                return match.group(0).replace("https://", "wss://")
+
+    try:
+        public_url = await asyncio.wait_for(read_lines(), timeout=15)
+    except asyncio.TimeoutError:
+        process.terminate()
+        raise RuntimeError("cloudflared started, but no public tunnel URL was found")
+
+    if public_url is None:
+        process.terminate()
+        raise RuntimeError("cloudflared started, but no public tunnel URL was found")
+
+    return process, public_url
 
 
 def get_room(room_name):
@@ -192,7 +201,6 @@ async def main():
             print("cloudflared install failed, running locally only")
 
     async with websockets.serve(echo, "localhost", PORT):
-
         await asyncio.Future()
 
     if tunnel_process is not None:
