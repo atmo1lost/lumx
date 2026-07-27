@@ -22,6 +22,7 @@ rooms = {}
 PORT = 8765
 
 if config["dev"]["verbose"]:
+    print(f"platform: {sys.platform}")
     print("ensuring cloudflared is installed")
 
 
@@ -38,7 +39,7 @@ def ensure_cloudflared():
             ["sudo", "apt", "install", "-y", "cloudflared"],
         ]
 
-    elif sys.platform("darwin"):
+    elif sys.platform == "darwin":
         install_cmds = [
             ["brew", "install", "cloudflared"],
         ]
@@ -163,6 +164,23 @@ async def echo(websocket):
         async for message in websocket:
             if not message.strip():
                 continue
+
+            try:
+                parsed = json.loads(message)
+            except json.JSONDecodeError:
+                parsed = None
+
+            if not isinstance(parsed, dict) or parsed.get("type") != "encrypted":
+                await websocket.send(
+                    json.dumps(
+                        {
+                            "type": "error",
+                            "message": "plaintext messages are rejected, encryption is required",
+                        }
+                    )
+                )
+                continue
+
             print(f"received: {message}")
             dead_clients = set()
             for client in room["clients"].copy():

@@ -31,8 +31,10 @@ async def client():
     # get username from config, if it returns false get username from input, if blank generate a random 4c
     username = config["client"].get("username") or input("username: ").strip()  or ''.join(random.choices(string.ascii_letters + string.digits, k=4))
 
-    # get room key
-    room_key = config["client"].get("room_key") or input("room key (leave blank for plaintext): ").strip()
+    # get room key, encryption is mandatory so this cannot be blank
+    room_key = config["client"].get("room_key")
+    while not room_key:
+        room_key = input("room key (required, all messages are encrypted): ").strip()
 
     # get server from config, if it returns false get server from input, if blank use localhost
     server = config["client"].get("server") or input("server: ").strip() or "wss://127.0.0.1:8765"
@@ -111,13 +113,13 @@ async def client():
 
         receive_task = asyncio.create_task(receiver())
 
+        if box is None:
+            print("failed to set up encryption, aborting")
+            return
+
         try:
             while True:
                 message = await asyncio.to_thread(input, ">: ")
-                if box is None:
-                    await websocket.send(f"{username}: {message}")
-                    continue
-
                 ciphertext = box.encrypt(message.encode("utf-8"))
                 await websocket.send(
                     json.dumps(
