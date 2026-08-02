@@ -37,7 +37,7 @@ async def client():
         room_key = input("room key (required, all messages are encrypted): ").strip()
 
     # get server from config, if it returns false get server from input, if blank use localhost
-    server = config["client"].get("server") or input("server: ").strip() or "wss://127.0.0.1:8765"
+    server = config["client"].get("server") or input("server: ").strip() or "ws://127.0.0.1:8765"
 
     # get room name from config, if it returns false get it from input, if blank it is "general"
     room_name = config["client"].get("channel") or input("room: ").strip() or "general"

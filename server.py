@@ -17,7 +17,6 @@ with open("config.yml", "r") as f:
 
 print("server starting")
 
-# aigh aigh aighhhhhhh
 rooms = {}
 PORT = 8765
 
@@ -29,24 +28,30 @@ if config["dev"]["verbose"]:
 def ensure_cloudflared():
     if config["dev"]["verbose"]:
         print("checking paths")
+        
     cloudflared_path = os.environ.get("CLOUDFLARED_PATH", "cloudflared")
     if shutil.which(cloudflared_path):
         return cloudflared_path
+        
+    windows_local_exe = None
+    if sys.platform.startswith("win"):
+        user_profile = os.environ.get("USERPROFILE", "")
+        windows_local_exe = os.path.join(user_profile, "Downloads", "cloudflared-windows-amd64.exe")
+        if os.path.exists(windows_local_exe):
+            return windows_local_exe
 
     if sys.platform.startswith("linux"):
         install_cmds = [
             ["sudo", "apt", "update"],
             ["sudo", "apt", "install", "-y", "cloudflared"],
         ]
-
     elif sys.platform == "darwin":
         install_cmds = [
             ["brew", "install", "cloudflared"],
         ]
-
     elif sys.platform.startswith("win"):
         install_cmds = [
-            ["cloudflared.exe", "service", "install"],
+            [windows_local_exe, "service", "install"],
         ]
     else:
         if config["dev"]["verbose"]:
@@ -62,16 +67,23 @@ def ensure_cloudflared():
                 print("running subprocess to install")
             subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as exc:
+            if sys.platform.startswith("win") and os.path.exists(windows_local_exe):
+                print("Service already installed or configured.")
+                break
             raise FileNotFoundError(
                 f"cloudflared install command failed: {' '.join(cmd)}"
             ) from exc
 
     if shutil.which(cloudflared_path):
         return cloudflared_path
+        
+    if sys.platform.startswith("win") and windows_local_exe and os.path.exists(windows_local_exe):
+        return windows_local_exe
 
     raise FileNotFoundError(
         "cloudflared installation finished but the binary was not found on PATH"
     )
+
 
 
 async def start_cloudflared(port):
@@ -98,7 +110,7 @@ async def start_cloudflared(port):
                 return match.group(0).replace("https://", "wss://")
 
     try:
-        public_url = await asyncio.wait_for(read_lines(), timeout=15)
+        public_url = await asyncio.wait_for(read_lines(), timeout=config["server"]["timeout"])
     except asyncio.TimeoutError:
         process.terminate()
         raise RuntimeError("cloudflared started, but no public tunnel URL was found")

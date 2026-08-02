@@ -4,5 +4,8 @@ client:
   channel: ""
   room_key: "" # if you are going to use this, make sure to tell the people your going to text the KEY
 
+server:
+  timeout: 30  # feel free to change this, cloudflared takes ages to start so you may aswell make it long
+
 dev:
   verbose: false

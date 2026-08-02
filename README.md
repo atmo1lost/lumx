@@ -13,13 +13,16 @@
 <h1>checklist</h1>
 
 - [ ] rate limiting
+- [ ] mobile install tutorial
 
 
 <h3>setup</h3>
 please check the wiki (https://github.com/atmo1lost/lumx/wiki)
 
+---
+
 <h3>legal</h3>
-please check the legal notice @ https://github.com/atmo1lost/lumx/legal.md
+please check the legal notice @ https://github.com/atmo1lost/lumx/LEGAL.md
 
 <h2>what is our vision</h2>
 <h4>our main goal with **lumx** is to help people keep their conversations private, even as surveillance and data collection keep expanding.<br> we think privacy shouldn't be something you have to fight for.</h4>
@@ -29,5 +32,5 @@ please check the legal notice @ https://github.com/atmo1lost/lumx/legal.md
 
 ## credits
 **founder**: atmo1lost (me) <br>
-**logo designer**: [luvpeng](https://pengis.online)
+**logo designer**: [luvpeng](https://pengis.online) 
 #
