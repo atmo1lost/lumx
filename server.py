@@ -21,6 +21,8 @@ rooms = {}
 PORT = 8765
 
 if config["dev"]["verbose"]:
+    print("config: ")
+    print(yaml.dump(config, default_flow_style=False))
     print(f"platform: {sys.platform}")
     print("ensuring cloudflared is installed")
 
